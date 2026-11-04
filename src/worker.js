@@ -35,9 +35,7 @@ export default {
     }
 
     return new Response('Not found', { status: 404 });
-  },
-
-  async scheduled(event, env) { await checkDeepSeek(env); }
+  }
 };
 
 // Rules assistant: answers from the tutorial script and FAQ (both written from the official rulebook) via DeepSeek.
@@ -51,22 +49,11 @@ const CHAT_MODELS = [
 ];
 const FIRST_DATA_MS = 9000;   // three models × 9 s stays under the page's 30 s wait
 const STALL_MS = 8000;        // an answer that pauses this long mid-way is dropped and asked again of the next model
-// Hourly check (cron): when DeepSeek doesn't answer, Qwen goes first until the next check.
+// Hourly check: Pittsburgh's worker (brass-pittsburgh-room) asks DeepSeek every hour and, when it doesn't answer, writes this key
+// to its KV namespace. This account's free plan has no cron trigger left, so this site only reads that key (CHAT_STATE is
+// bound to Pittsburgh's namespace in wrangler.jsonc) and puts Qwen first while it is there.
 const DEEPSEEK_DOWN = 'deepseek-down';   // KV key; expires on its own a little after the next hourly check
 const ORDER = { normal: [0, 1, 2], deepseekDown: [1, 0, 2] };   // indexes into CHAT_MODELS
-
-async function checkDeepSeek(env) {
-  const fails = [];
-  const o = await openModel(0, env, [{ role: 'user', content: '你好' }], fails);
-  if (o) {
-    o.reader.cancel().catch(() => {});
-    await env.CHAT_STATE.delete(DEEPSEEK_DOWN);
-    console.log('deepseek check: ok');
-  } else {
-    await env.CHAT_STATE.put(DEEPSEEK_DOWN, JSON.stringify({ at: new Date().toISOString(), fails }), { expirationTtl: 3900 });
-    console.log('deepseek check: down, Qwen first for the next hour', fails.join('/'));
-  }
-}
 const CHAT_SYSTEM = `你是「阿纳克规则助手」，帮玩家解答桌游《阿纳克遗迹》（Lost Ruins of Arnak）及其扩展《探险队长》《失踪的探险队》的规则问题，也可以解释本网站「阿纳克遗迹小助手」怎么用。
 
 回答要求：
