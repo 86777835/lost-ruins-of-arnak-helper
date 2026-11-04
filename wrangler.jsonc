@@ -1,5 +1,5 @@
 {
-  "name": "arnak-helper",
+  "name": "lost-ruins-of-arnak-room",
   "main": "src/worker.js",
   "compatibility_date": "2026-05-28",
   "assets": {
@@ -15,5 +15,6 @@
     "bindings": [{ "name": "ROOM", "class_name": "Room" }, { "name": "LOBBY", "class_name": "Lobby" }, { "name": "ARCHIVE", "class_name": "Archive" }]
   },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room", "Lobby", "Archive"] }],
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  "routes": [{ "pattern": "arnak.leisurecat.cloud", "custom_domain": true }]
 }
