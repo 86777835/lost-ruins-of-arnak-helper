@@ -99,7 +99,7 @@
 
 每个页面右下角都有「规则」按钮，用中文问规则。只依据本站的讲解稿和常见问题作答，资料里没有的不会乱编，也不剧透冒险模式。
 
-模型和匹兹堡助手相同：DeepSeek V4.1 Flash（`deepseek-flash`）→ Cloudflare Workers AI 上的 Qwen3.8 27B（`@cf/qwen/qwen3.8-27b`）→ DeepSeek V4 Pro（`deepseek-v4-pro`）。每个模型 9 秒内必须开始回答，中途停顿超过 8 秒就换下一个从头回答；页面上不显示是哪个模型答的。每小时一次的定时检查（Cron Trigger）发现 DeepSeek 不通时，接下来一小时先用 Qwen，状态存在 KV 里。
+模型和匹兹堡助手相同：DeepSeek V4.1 Flash（`deepseek-flash`）→ Cloudflare Workers AI 上的 Qwen3.8 27B（`@cf/qwen/qwen3.8-27b`）→ DeepSeek V4 Pro（`deepseek-v4-pro`）。每个模型 9 秒内必须开始回答，中途停顿超过 8 秒就换下一个从头回答；页面上不显示是哪个模型答的。DeepSeek 不通时，接下来一小时直接先用 Qwen。这个 Cloudflare 账号免费版的定时任务（Cron Trigger）已经用满，所以本站不自己检查，而是读匹兹堡助手每小时检查后写进 KV 的结果：`wrangler.jsonc` 里 `CHAT_STATE` 绑定的就是匹兹堡的 KV，本站只读不写。
 
 <p>
 <img src="docs/screenshots/chat.jpg" width="260" alt="规则助手">
@@ -132,6 +132,7 @@ wrangler deploy              # 部署到你自己的 Cloudflare 账号
 
 自己部署时：
 - **域名**：在 `wrangler.jsonc` 里加上自己的 `routes`（自定义域名）。
+- **DeepSeek 状态**：`CHAT_STATE` 绑定的是匹兹堡助手的 KV。自己部署时改成你自己的 KV，再加一个每小时检查 DeepSeek 的定时任务（参考匹兹堡助手的 `checkDeepSeek`）；不改也能用，只是少了「不通时先用 Qwen」这一步。
 - **规则助手**（可选）：运行 `wrangler secret put DEEPSEEK_API_KEY --name <worker 名>` 填入 DeepSeek API 密钥；不配置时助手会提示「还没有配置好」。
 
 重新生成教程页：
@@ -157,7 +158,7 @@ node tests/test_history.mjs https://你的域名/ ./shots --live                
 node tests/test_chat.mjs    https://你的域名/ ./shots --live                  # 规则助手线上实问一次
 ```
 
-`--fake-key` 和 `--mock-upstream` 需要 `wrangler dev --port 8841 --test-scheduled --var DEEPSEEK_API_KEY:fake --var DEEPSEEK_BASE:http://127.0.0.1:8842 --var CHAT_CF_MODEL:@cf/none/missing`（模拟上游在 8842 端口；`@cf/none/missing` 让本地测试不消耗共享的 Workers AI 免费额度）。两者连着跑会触发每分钟 8 次的限流，中间隔一分钟。本地测定时检查：访问 `/__scheduled`。
+`--fake-key` 和 `--mock-upstream` 需要 `wrangler dev --port 8841 --var DEEPSEEK_API_KEY:fake --var DEEPSEEK_BASE:http://127.0.0.1:8842 --var CHAT_CF_MODEL:@cf/none/missing`（模拟上游在 8842 端口；`@cf/none/missing` 让本地测试不消耗共享的 Workers AI 免费额度）。两者连着跑会触发每分钟 8 次的限流，中间隔一分钟。想在本地模拟「DeepSeek 不通」：`wrangler kv key put deepseek-down 1 --binding CHAT_STATE --local`（只写本地模拟数据，不碰线上）。
 
 打完整局的测试会在往期对局里留下记录，所以请对本地 `wrangler dev` 运行；线上只跑 `--live`。
 
