@@ -473,3 +473,11 @@ table.st{width:100%;border-collapse:collapse;background:rgba(255,252,243,.6);bor
 .camp-end p{margin-top:4px;font-size:12.5px;color:var(--ink2)}
 input.plot{flex:1;min-width:0;height:44px;border-radius:6px;border:1.5px solid var(--brass);background:#fffdf6;padding:0 12px;font:500 16px var(--sans);outline:none}
 .note a{color:var(--navy2);font-weight:600}
+
+/* Back navigation */
+.back-nav{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 12px;border:1px solid var(--brass);border-radius:18px;background:var(--steel);color:var(--brass2);font:600 13px var(--sans);text-decoration:none;white-space:nowrap}
+.back-row{text-align:left}
+.hero.with-back{position:relative;padding-top:calc(env(safe-area-inset-top) + 62px)}
+.hero .back-row,.hero-art .back-row{position:absolute;z-index:2;top:calc(env(safe-area-inset-top) + 10px);left:calc(env(safe-area-inset-left) + 12px)}
+.bar{flex-wrap:wrap;padding-left:calc(env(safe-area-inset-left) + 12px)}
+.bar .back-row{flex-basis:100%}

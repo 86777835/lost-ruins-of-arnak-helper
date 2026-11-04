@@ -44,7 +44,7 @@ open(out, 'w').write(f'''<!doctype html>
 </head>
 <body>
 <div style="position:absolute;width:0;height:0;overflow:hidden"><img src="img/icon-512.jpg" alt=""></div>
-<div class="hero"><div class="en">LOST RUINS OF ARNAK</div><h1>新手教程</h1><div class="orn"></div></div><div class="band"></div>
+<div class="hero with-back"><div class="back-row"><a class="back-nav" href="/" data-html2canvas-ignore>‹ 返回</a></div><div class="en">LOST RUINS OF ARNAK</div><h1>新手教程</h1><div class="orn"></div></div><div class="band"></div>
 <div class="wrap guide">
 <p class="note">依据 CGE 官方规则书（简体中文版，一刻馆出版）用自己的话整理，有疑问以规则书为准。官方规则书可在 <a href="https://www.czechgames.com/games/lost-ruins-of-arnak" target="_blank" rel="noopener">CGE 官网</a>下载。</p>
 <h2 class="h">图文讲解<small>{len(secs)} 节</small></h2>
