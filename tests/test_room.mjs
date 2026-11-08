@@ -54,9 +54,7 @@ await B.click('[data-act="pickl"][data-l="falconer"]'); await wait(300);
 await A.click('[data-act="lead"][data-i="2"]'); await A.click('[data-act="pickl"][data-l="baroness"]'); await wait(300);
 eq('A sees leader names', await A.$$eval('.ldr', l => l.map(x => x.childNodes[0].textContent)), ['海军上校', '驯鹰师', '男爵夫人']);
 await A.click('[data-act="first"][data-id="green"]'); await wait(300);
-await B.click('[data-act="draw"]'); await wait(500);
-eq('draw plays on A too', await A.isVisible('#draw'), true);
-await A.click('#draw'); await B.click('#draw');
+eq('start player: link to the hub finger chooser', (await B.textContent('[data-act="order"]')).includes('手指轮盘'), true);
 // the setup checklist follows the choices
 await A.click('[data-act="setup"]'); await A.waitForSelector('.sl');
 const sl = await A.textContent('.sl');

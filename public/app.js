@@ -75,10 +75,8 @@ function connect() {
     if (e.data === 'pong') return;
     const m = JSON.parse(e.data);
     if (m.type === 'state') {
-      const drew = S && (m.state.draw || 0) > (S.draw || 0);
       const dealt = S && (m.state.deal || 0) > (S.deal || 0);
       S = m.state; remember(code); render();
-      if (drew) playDraw();
       if (dealt) toast('队长已随机分配');
     }
     else if (m.type === 'error' && m.error === 'noroom') { noRoom = true; forget(code); ws.close(); render(); }
@@ -231,7 +229,7 @@ function setupView() {
         <button class="ib" data-act="move" data-i="${i}" data-j="${i + 1}" ${i === S.n - 1 ? 'disabled' : ''} aria-label="下移">↓</button>` : ''}
       </div>`).join('')}</div>
     ${S.n > 1 ? `<p class="note">规则书：最近去过一个从没去过的地方的人当起始玩家。也可以随机抽。${C ? '对手在第 I 轮最后行动。' : ''}</p>` : ''}
-    <div class="btns">${S.n > 1 ? '<button class="btn ghost" data-act="draw">随机抽起始玩家</button>' : ''}${L ? '<button class="btn ghost" data-act="deal">随机分配队长</button>' : ''}</div>
+    <div class="btns">${S.n > 1 ? '<button class="btn ghost" data-act="order">手指轮盘 / 抽签定起始玩家 ›</button>' : ''}${L ? '<button class="btn ghost" data-act="deal">随机分配队长</button>' : ''}</div>
     <button class="btn ghost" data-act="setup">看布置清单</button>
     <button class="btn" data-act="begin" ${missing ? 'disabled' : ''}>${missing ? '先给每位玩家选队长' : C ? `开始第 ${S.camp.ch} 章` : '开始游戏'}</button>`}`;
 }
@@ -507,30 +505,8 @@ function showImage(url) {
   document.body.appendChild(el);
 }
 
-/* ---------- start player draw (plays on every phone when someone draws) ---------- */
-const BAG_SVG = `<svg viewBox="0 0 120 130" width="120" height="130" aria-hidden="true">
-  <path d="M40 34C26 50 10 66 10 94c0 24 20 32 50 32s50-8 50-32c0-28-16-44-30-60z" fill="#6b4a2b"/>
-  <path d="M40 34C26 50 10 66 10 94c0 24 20 32 50 32" fill="none" stroke="#4a321c" stroke-width="3" stroke-dasharray="5 4"/>
-  <path d="M42 30 32 8l14 9 6-13 8 12 8-12 6 13 14-9-10 22z" fill="#7d5a36"/><path d="M38 33h44l-3 8H41z" fill="#3e2a16"/>
-  <circle cx="60" cy="88" r="17" fill="none" stroke="#e6c97d" stroke-width="3"/>
-  <path d="M60 74l5 9 9 2-7 6 2 9-9-5-9 5 2-9-7-6 9-2z" fill="none" stroke="#e6c97d" stroke-width="2.4" stroke-linejoin="round"/></svg>`;
-const DRAW_START_MS = 1100, DRAW_STEP_MS = 650, DRAW_HOLD_MS = 1500;
-function playDraw() {
-  const order = turnOrder(S).filter(id => id !== RIVAL);
-  document.getElementById('draw')?.remove();
-  const el = document.createElement('div');
-  el.id = 'draw'; el.className = 'draw';
-  el.style.setProperty('--start', DRAW_START_MS + 'ms'); el.style.setProperty('--step', DRAW_STEP_MS + 'ms');
-  el.innerHTML = `<div class="dr-box"><div class="dr-t">抽起始玩家</div>
-    <div class="dr-slots">${order.map((id, i) => `<div class="dr-s${i === 0 ? ' first' : ''}" style="--d:${(order.length - 1) / 2 - i};--i:${i}">
-      ${por(id)}<b>${i === 0 ? '起始' : i + 1}</b><i>${esc(pname(id))}</i></div>`).join('')}</div>
-    <div class="dr-bag">${BAG_SVG}</div><div class="dr-skip">点击任意处跳过</div></div>`;
-  el.addEventListener('click', () => el.remove());
-  document.body.appendChild(el);
-  const end = DRAW_START_MS + order.length * DRAW_STEP_MS + DRAW_HOLD_MS;
-  setTimeout(() => el.classList.add('out'), end);
-  setTimeout(() => el.remove(), end + 400);
-}
+/* ---------- start player: the hub's finger chooser / bag draw, then 「返回」 comes back here ---------- */
+const orderUrl = n => `https://boardgame.leisurecat.cloud/?order=${n}&back=${encodeURIComponent(location.href)}`;
 
 /* ---------- sheets: keypad, leader picker, setup checklist ---------- */
 function sheetView() {
@@ -646,7 +622,7 @@ document.addEventListener('click', e => {
     case 'deal': send({ t: 'deal' }); break;
     case 'first': send({ t: 'first', id: d.id }); break;
     case 'move': flushAll(); send({ t: 'move', i: +d.i, j: +d.j }); break;
-    case 'draw': flushAll(); send({ t: 'draw' }); break;
+    case 'order': flushAll(); setTimeout(() => { location.href = orderUrl(S.n); }, 150); break;   // let the name edits reach the room first
     case 'begin': flushAll(); ui.chk = {}; send({ t: 'begin' }); break;
     case 'setup': ui.sheet = { kind: 'setup' }; render(); break;
     case 'tab': ui.tab = d.tab; store.set('arnak-tab', d.tab); render(); window.scrollTo(0, 0); break;

@@ -158,12 +158,6 @@ export function reduce(s, a) {
       if (!setup || !ids().includes(a.id)) return null;
       S.start = a.id; return done();
 
-    case 'draw':    // setup: random start player; every phone plays the draw
-      if (!setup || S.n < 2) return null;
-      S.start = ids()[Math.floor(Math.random() * S.n)];
-      S.draw = (s.draw || 0) + 1;
-      return done();
-
     case 'begin':
       if (!setup) return null;
       if (usesLeaders(S) && seated(S).some(p => !p.leader || !leaderOk(S, p.leader))) return null;   // everyone needs a leader first

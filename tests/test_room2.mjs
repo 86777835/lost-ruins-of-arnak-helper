@@ -44,7 +44,7 @@ await A.click('[data-act="create"]'); await A.waitForURL(/\?r=/); await A.waitFo
 const soloUrl = A.url();
 await A.click('[data-act="n"][data-n="1"]'); await wait(250);
 eq('solo: rival difficulty chips', await A.$$eval('[data-act="rival"]', c => c.length), 6);
-eq('solo: no start-player buttons', await A.$('[data-act="draw"]'), null);
+eq('solo: no start-player buttons', await A.$('[data-act="order"]'), null);
 await A.click('[data-act="rival"][data-red="4"]'); await wait(250);
 await A.fill('[data-name="0"]', '独行侠'); await A.press('[data-name="0"]', 'Enter'); await wait(400);
 await A.click('[data-act="setup"]'); await A.waitForSelector('.sl');
