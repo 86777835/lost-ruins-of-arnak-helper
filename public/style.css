@@ -465,3 +465,5 @@ input.plot{flex:1;min-width:0;height:44px;border-radius:6px;border:1.5px solid v
 .hero .back-row,.hero-art .back-row{position:absolute;z-index:2;top:calc(env(safe-area-inset-top) + 10px);left:calc(env(safe-area-inset-left) + 12px)}
 .bar{flex-wrap:wrap;padding-left:calc(env(safe-area-inset-left) + 12px)}
 .bar .back-row{flex-basis:100%}
+/* 写评价: opens this game's review form on the hub, then 返回 comes back here */
+.hero-art .rate-row{left:auto;right:calc(env(safe-area-inset-right) + 12px)}
