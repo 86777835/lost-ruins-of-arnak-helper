@@ -88,7 +88,7 @@
 
 ### 新手教程与常见问题
 
-16 节图文讲解，加上 39 条常见问题（含易混卡牌和设计者在 BGG 上的裁定），每条附规则书页码或 BGG 链接。插图为原创绘制。
+16 节图文讲解，加上 40 条常见问题（含易混卡牌和设计者在 BGG 上的裁定），每条附规则书页码或 BGG 链接。插图为原创绘制。
 
 <p>
 <img src="docs/screenshots/guide.jpg" width="260" alt="新手教程">
@@ -97,7 +97,9 @@
 
 ### 规则助手
 
-每个页面右下角都有「规则」按钮，用中文问规则。只依据本站的讲解稿和常见问题作答，资料里没有的不会乱编，也不剧透冒险模式。
+每个页面右下角都有「规则」按钮，用中文问规则。先只依据本站的讲解稿和常见问题作答，资料里没有的不会乱编，也不剧透冒险模式。
+
+**联网查找（2026-11-12 起，照匹兹堡移植）**：讲解稿和常见问题里没有答案的阿纳克规则问题（比如某张卡、某位队长的细节），模型只回一行「【需联网】+英文搜索词」。搜索词以 Lost Ruins of Arnak 开头，涉及扩展时带上扩展英文名（Expedition Leaders、The Missing Expedition、Twisted Paths）。服务器转去调 DeepSeek 的搜索接口（`/v1/tools/search`，先只搜 BGG，不足 3 条再搜全网），再让模型只依据搜到的摘要作答，用 [1] [2] 标出处，并指出某个说法属于哪个扩展。页面在这类回答上方固定显示「本站资料没有这一条，以下来自网上讨论，本站未核对」，下面列来源链接；搜不到或搜索失败就明说，不编。问冒险模式剧情和与本游戏无关的问题不联网。每次联网在日志里记一条 `chat web search`，用来核对后补进常见问题。
 
 模型和匹兹堡助手相同：DeepSeek V4.1 Flash（`deepseek-flash`）→ Cloudflare Workers AI 上的 Qwen3.8 27B（`@cf/qwen/qwen3.8-27b`）→ DeepSeek V4 Pro（`deepseek-v4-pro`）。每个模型 9 秒内必须开始回答，中途停顿超过 8 秒就换下一个从头回答；页面上不显示是哪个模型答的。DeepSeek 不通时，接下来一小时直接先用 Qwen。这个 Cloudflare 账号免费版的定时任务（Cron Trigger）已经用满，所以本站不自己检查，而是读匹兹堡助手每小时检查后写进 KV 的结果：`wrangler.jsonc` 里 `CHAT_STATE` 绑定的就是匹兹堡的 KV，本站只读不写。
 
@@ -156,11 +158,12 @@ node tests/test_review.mjs  http://localhost:8841/ ./shots                    # 
 node tests/test_chat.mjs    http://localhost:8841/ ./shots --no-key           # 规则助手界面（wrangler dev 不带密钥）
 node tests/test_chat.mjs    http://localhost:8841/ ./shots --fake-key         # 请求校验、上游出错、限流
 node tests/test_chat.mjs    http://localhost:8841/ ./shots --mock-upstream    # 备用模型切换
+node tests/test_chat.mjs    http://localhost:8841/ ./shots --mock-web         # 联网查找：能答不联网、标记拆块、先解释后联网、没搜到、搜索失败、无关问题
 node tests/test_history.mjs https://你的域名/ ./shots --live                  # 线上冒烟：打完一局再撤销，不留记录
 node tests/test_chat.mjs    https://你的域名/ ./shots --live                  # 规则助手线上实问一次
 ```
 
-`--fake-key` 和 `--mock-upstream` 需要 `wrangler dev --port 8841 --var DEEPSEEK_API_KEY:fake --var DEEPSEEK_BASE:http://127.0.0.1:8842 --var CHAT_CF_MODEL:@cf/none/missing`（模拟上游在 8842 端口；`@cf/none/missing` 让本地测试不消耗共享的 Workers AI 免费额度）。两者连着跑会触发每分钟 8 次的限流，中间隔一分钟。想在本地模拟「DeepSeek 不通」：`wrangler kv key put deepseek-down 1 --binding CHAT_STATE --local`（只写本地模拟数据，不碰线上）。
+`--fake-key`、`--mock-upstream` 和 `--mock-web` 需要 `wrangler dev --port 8841 --var DEEPSEEK_API_KEY:fake --var DEEPSEEK_BASE:http://127.0.0.1:8842 --var CHAT_CF_MODEL:@cf/none/missing`（模拟上游在 8842 端口；`@cf/none/missing` 让本地测试不消耗共享的 Workers AI 免费额度）。这三组连着跑会触发每分钟 8 次的限流，每组之间隔一分钟。想在本地模拟「DeepSeek 不通」：`wrangler kv key put deepseek-down 1 --binding CHAT_STATE --local`（只写本地模拟数据，不碰线上）。
 
 打完整局的测试会在往期对局里留下记录，所以请对本地 `wrangler dev` 运行；线上只跑 `--live`。
 
