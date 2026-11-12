@@ -172,7 +172,7 @@ function landing() {
       <button class="card lobby" data-act="rejoin" data-code="${c}" data-k="lb-${c}">
         <span class="lc">${c}${tag(c)}</span><span class="lp"></span><span class="ls"><small>点击进入</small></span>
       </button>`).join('') : '<div class="empty">暂无进行中的房间</div>';
-  return `<div class="hero-art cover" data-k="hero"><div class="back-row"><a class="back-nav" href="https://boardgame.leisurecat.cloud" data-html2canvas-ignore>‹ 全部游戏</a></div><div class="back-row rate-row"><a class="back-nav" href="https://boardgame.leisurecat.cloud/?rate=arnak&back=${encodeURIComponent(location.href)}" data-html2canvas-ignore>★ 写评价</a></div><img src="img/cover-bg.jpg" alt=""><img class="cv" src="img/cover.jpg" alt="《阿纳克遗迹》游戏盒封面"><div class="ht">
+  return `<div class="hero-art cover" data-k="hero"><div class="back-row"><a class="back-nav" href="https://boardgame.leisurecat.cloud" data-html2canvas-ignore>‹ 全部游戏</a></div><div class="back-row rate-row"><a class="back-nav rate-nav" href="https://boardgame.leisurecat.cloud/?rate=arnak&back=${encodeURIComponent(location.href)}" data-html2canvas-ignore>★ 写评价</a></div><img src="img/cover-bg.jpg" alt=""><img class="cv" src="img/cover.jpg" alt="《阿纳克遗迹》游戏盒封面"><div class="ht">
       <div class="hz">阿纳克遗迹小助手</div><div class="hs">轮次不乱 · 计分不漏</div></div></div>
     <div class="wrap" data-k="landing">
     <div class="card start">

@@ -13,7 +13,7 @@ try {
   const page = await context.newPage();
   const check = async label => {
     await page.evaluate(() => window.scrollTo(0, 0));
-    const problems = await page.locator('.back-nav').evaluate(nav => {
+    const problems = await page.locator('.back-nav:not(.rate-nav)').evaluate(nav => {
       const a = nav.getBoundingClientRect(), errors = [];
       if (a.height < 36 || a.width <= 0 || a.top < 0 || a.bottom > innerHeight || a.left < 0 || a.right > innerWidth) errors.push('navigation visibility/size');
       if (document.documentElement.scrollWidth > innerWidth) errors.push('horizontal overflow');
@@ -28,18 +28,18 @@ try {
     console.log('PASS', label);
   };
   await page.goto(BASE);
-  assert.equal(await page.locator('.back-nav').textContent(), '‹ 全部游戏');
-  assert.equal(await page.locator('.back-nav').getAttribute('href'), 'https://boardgame.leisurecat.cloud');
+  assert.equal(await page.locator('.back-nav:not(.rate-nav)').textContent(), '‹ 全部游戏');
+  assert.equal(await page.locator('.back-nav:not(.rate-nav)').getAttribute('href'), 'https://boardgame.leisurecat.cloud');
   await check('landing navigation');
   await page.screenshot({ path: `${OUT}/nav_arnak_landing.png` });
   await page.click('[data-act="create"]');
   await page.waitForSelector('[data-act="begin"]');
   const code = new URL(page.url()).searchParams.get('r');
-  assert.equal(await page.locator('.back-nav').textContent(), '‹ 首页');
+  assert.equal(await page.locator('.back-nav:not(.rate-nav)').textContent(), '‹ 首页');
   await page.click('[data-act="side"][data-side="snake"]');
   await page.waitForSelector('[data-side="snake"].on');
   await check('setup navigation');
-  await page.click('.back-nav');
+  await page.click('.back-nav:not(.rate-nav)');
   await page.waitForSelector('[data-act="create"]');
   await page.click(`[data-act="rejoin"][data-code="${code}"]`);
   await page.waitForSelector('[data-side="snake"].on');
@@ -59,7 +59,7 @@ try {
     await check(`${tab} navigation`);
   }
   assert.equal(await page.locator('#shot .back-nav').count(), 0);
-  await page.click('.back-nav');
+  await page.click('.back-nav:not(.rate-nav)');
   await page.waitForSelector('[data-act="create"]');
   await page.fill('#joinCode', code);
   await page.click('[data-act="join"]');
@@ -68,11 +68,11 @@ try {
   console.log('PASS completed game retained after rejoining by code');
   for (const name of ['guide', 'history']) {
     await page.goto(new URL(`${name}.html`, BASE).href);
-    assert.equal(await page.locator('.back-nav').textContent(), '‹ 返回');
-    assert.equal(await page.locator('.back-nav').getAttribute('href'), '/');
+    assert.equal(await page.locator('.back-nav:not(.rate-nav)').textContent(), '‹ 返回');
+    assert.equal(await page.locator('.back-nav:not(.rate-nav)').getAttribute('href'), '/');
     await check(`${name} navigation`);
     await page.screenshot({ path: `${OUT}/nav_arnak_${name}.png` });
-    await page.click('.back-nav');
+    await page.click('.back-nav:not(.rate-nav)');
     await page.waitForSelector('[data-act="create"]');
   }
   console.log('ALL PASS');
