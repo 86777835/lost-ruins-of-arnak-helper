@@ -28,6 +28,8 @@ const fab = $c('.cfab'), panel = $c('.cpanel'), log = $c('.clog'), form = $c('.c
 const open = on => { panel.classList.toggle('hidden', !on); fab.classList.toggle('hidden', on); if (on) box.focus(); };
 fab.onclick = () => open(true);
 $c('.cx').onclick = () => open(false);
+// Other pages (the teach page) open the panel and ask a question in one tap.
+window.askRules = q => { open(true); ask(q); };
 $c('.csug').onclick = e => { const b = e.target.closest('button'); if (b) ask(b.textContent); };
 form.onsubmit = e => { e.preventDefault(); ask(box.value); };
 box.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); ask(box.value); } };

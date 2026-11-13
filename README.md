@@ -23,6 +23,14 @@
 
 ## 功能一览
 
+### 5 分钟讲规则（/teach）
+
+首页「第一次玩？5 分钟讲规则」，带新人快速开局：讲的人照着念主流程（8 段，每段标了大约几秒），每个重要要素都用一句话点到（牌库构筑、移动值、交通图标和飞机、发现遗址、守卫、神像槽、物品和神器、研究轨、助手、失落的神庙……），具体判定交给规则助手。带下划线的词点一下，从底部弹出实物图、在哪儿看到、什么意思；每段末尾的「问」按钮一点就问规则助手。
+
+主流程讲完，再一条条过「注意事项」：主流程之外的易错点，每条都写好答案，默认收起。顶部可以切换「只玩基础」或「带扩展队长」，带扩展时讲稿加上探险队长、帐篷标记、蓝色神像槽和新研究轨，注意事项多 7 条扩展的（每台手机记住自己的选择）。页面底部是按桌上位置分组的图标速查。
+
+图片截自 CGE 官方规则书简体中文版（基础版、《探险队长》），页脚署名并链接原文。讲稿和注意事项用自己的话写，依据规则书和本站常见问题，数据都在 `public/teach.js` 开头。
+
 ### 准备：扩展、版图、队长，一键生成布置清单
 
 1–4 人。勾选《探险队长》《失踪的探险队》，选鸟之神庙或蛇之神庙一面，以及研究轨（原版、猴之神庙、蜥蜴神庙、瀑布神庙、古树神庙）。可以用探险队长：每人点头像选队长（10 位，附一句话能力和最常见的误解），或者随机分配。座位顺时针排好，起始玩家可以手动指定或随机抽。单人游戏另选对手难度（红色行动板块 0–5 块）。
@@ -115,7 +123,7 @@
 
 | 部分 | 说明 |
 |---|---|
-| `public/` | 页面：`index.html`、`app.js`、`style.css`、`img/`、教程页 `guide.html`、往期对局 `history.html` |
+| `public/` | 页面：`index.html`、`app.js`、`style.css`、`img/`、教程页 `guide.html`、往期对局 `history.html`、讲规则页 `teach.html` + `teach.js`（规则书截图在 `img/teach/`） |
 | `public/logic.js` | 规则与状态逻辑（轮次、跳过、计分、同分、冒险章节分），页面和服务端共用，服务端用 `reduce()` 权威判定 |
 | `public/steps.js` | 布置清单、每轮开始、轮末整理、「别忘了」和队长说明，每条带规则书页码 |
 | `src/worker.js` | Cloudflare Worker：建房接口；`Room`（每个房间一个 Durable Object，WebSocket 实时同步）；`Lobby`（首页房间列表）；`Archive`（往期对局和成绩参照）；`/api/chat` 规则助手（流式转发、备用模型切换、按 IP 限流，密钥只在服务端） |
@@ -155,6 +163,7 @@ node tests/test_room.mjs    http://localhost:8841/ ./shots                    # 
 node tests/test_room2.mjs   http://localhost:8841/ ./shots                    # 单人对手、冒险模式两章、小屏、改名、长图、断线重连
 node tests/test_history.mjs http://localhost:8841/ ./shots --many-rooms       # 往期对局存档、搜索、成绩参照；房间多时首页按钮仍在首屏
 node tests/test_review.mjs  http://localhost:8841/ ./shots                    # 结算页评价卡（总入口接口用 page.route 拦截，不写线上数据）
+node tests/test_teach.mjs   http://localhost:8841/ ./shots                    # 讲规则页：段落、要素、术语弹窗、两种模式、注意事项、图标速查、手机宽度（模拟 /api/chat，也可对线上跑）
 node tests/test_chat.mjs    http://localhost:8841/ ./shots --no-key           # 规则助手界面（wrangler dev 不带密钥）
 node tests/test_chat.mjs    http://localhost:8841/ ./shots --fake-key         # 请求校验、上游出错、限流
 node tests/test_chat.mjs    http://localhost:8841/ ./shots --mock-upstream    # 备用模型切换
